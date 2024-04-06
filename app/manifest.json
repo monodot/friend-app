@@ -1,10 +1,10 @@
 {
-  "name": "Friend App",
-  "short_name": "FriendApp",
+  "name": "Mainmates",
+  "short_name": "Mates",
   "description": "A simple, secure app to keep track of your friends, remember conversations and build better connections.",
-  "start_url": "https://monodot.github.io/friend-app",
-  "theme_color": "#BEA7E5",
-  "background_color": "#F8F4F9",
+  "start_url": "https://monodot.github.io/mainmates",
+  "theme_color": "#EEEEEE",
+  "background_color": "#EEEEEE",
   "display": "standalone",
   "icons": [
     {
