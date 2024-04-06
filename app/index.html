@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!-- Based on the MDN PWA tutorial at: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Tutorials/CycleTracker -->
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Friend app</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="icons/app.svg" />
+  </head>
+  <body>
+    <h1>Friend app</h1>
+    <form>
+      <fieldset>
+        <legend>Add a note</legend>
+        <p>
+          <label for="contact">Contact</label>
+          <select id="note-contact" required>
+            <option value="">Select a contact</option>
+            <option value="Karina">Karina</option>
+            <option value="Andrew">Andrew</option>
+            <option value="Mo">Mo</option>
+          </select>
+        </p>
+        <p>
+          <label for="date">Date</label>
+          <input type="date" id="note-date" required />
+        </p>
+        <p>
+          <label for="type">Type</label>
+          <select id="note-type" required>
+            <option value="">Select a type</option>
+            <option value="phone">Phone call</option>
+            <option value="meeting">Hang out</option>
+          </select>
+        </p>
+        <p>
+          <label for="note">Note</label>
+          <textarea id="note-text" required></textarea>
+        </p>
+        <p>
+          <button type="submit">Add note</button>
+        </p>
+      </fieldset>
+    </form>
+    <section id="recent-notes"></section>
+
+    <p>
+      Menu:
+      <a href="export.html">Export</a>
+    </p>
+    <script src="app.js" defer></script>
+    <!-- Register the app's service worker. -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js");
+      }
+    </script>
+  </body>
+</html>
