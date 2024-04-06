@@ -1,6 +1,10 @@
 // Add the storage key as an app-wide constant
 const STORAGE_KEY = "friend-app-notes";
 
+let state = {
+  selectedView: { name: "home" },
+};
+
 // create constants for the form and the form controls
 const recentNotesContainer = document.getElementById("recent-notes");
 const newNoteFormE = document.getElementsByTagName("form")[0];
@@ -8,6 +12,20 @@ const noteContactSelectE = document.getElementById("note-contact");
 const noteDateInputE = document.getElementById("note-date");
 const noteTypeSelectE = document.getElementById("note-type");
 const noteTextInputE = document.getElementById("note-text");
+
+const canvasContainer = document.getElementById("canvas");
+
+const newNoteLink = document.getElementById("new-note-link");
+newNoteLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  navigateToView({ name: "new-note" });
+});
+document.querySelectorAll(".home-link").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    navigateToView({ name: "home" });
+  });
+});
 
 // Listen to form submissions.
 newNoteFormE.addEventListener("submit", (event) => {
@@ -30,23 +48,24 @@ newNoteFormE.addEventListener("submit", (event) => {
     text: noteText,
   };
 
-  // Store the new period in our client-side storage.
+  // Store the new note in our client-side storage.
   storeNewNote(note);
-  // storeNewPeriod(startDate, endDate);
 
   // Refresh the UI.
-  renderRecentNotes();
+  const recentNotesElement = document.querySelector('recent-notes');
+  recentNotesElement.notes = getAllNotes();
 
   // Reset the form.
   newNoteFormE.reset();
-});
 
+  navigateToView({ name: "home" });
+});
 
 function storeNewNote(note) {
   // Get data from storage.
   const notes = getAllNotes();
 
-  // Add the new note object to the end of the array of period objects.
+  // Add the new note object to the end of the array of note objects.
   notes.push(note);
 
   // Store the updated array back in the storage.
@@ -64,17 +83,16 @@ function getAllNotes() {
   return notes;
 }
 
-
 function renderRecentNotes() {
-  // get the parsed string of periods, or an empty array.
+  // get the parsed string of notes, or an empty array.
   const notes = getAllNotes();
 
-  // exit if there are no periods
+  // exit if there are no notes
   if (notes.length === 0) {
     return;
   }
 
-  // Clear the list of past periods, since we're going to re-render it.
+  // Clear the list of past notes, since we're going to re-render it.
   recentNotesContainer.innerHTML = "";
 
   const recentNotesHeader = document.createElement("h2");
@@ -82,12 +100,14 @@ function renderRecentNotes() {
 
   const recentNotesList = document.createElement("ul");
 
-  // Loop over all periods and render them.
+  // Loop over all notes and render them.
   notes.forEach((note) => {
     const noteEl = document.createElement("li");
     // TODO Fix horrible security hole of rendering unsanitized HTML
     noteEl.innerHTML = `
-      <p><strong>${note.contact}</strong> <time>${formatDate(note.date)}</time> <em>${note.type}</em></p>
+      <p><strong>${note.contact}</strong> <time>${formatDate(
+      note.date
+    )}</time> <em>${note.type}</em></p>
       <p>${note.text}</p>`;
     recentNotesList.appendChild(noteEl);
   });
@@ -105,6 +125,58 @@ function formatDate(dateString) {
   return date.toLocaleDateString("en-US", { timeZone: "UTC" });
 }
 
-// Start the app by rendering the recent notes.
-renderRecentNotes();
+function navigateToView(target) {
+  const { name, params } = target;
+  // alert('ya clicked it!');
+  // Hide all views
+  document.querySelectorAll("main > *").forEach((view) => {
+    view.style.display = "none";
+  });
+  switch (name) {
+    case "home":
+      state.selectedView = { name: "home" };
+      // document.querySelector("#home-view").classList.remove("hidden");
+      document.querySelector("#home-view").style.display = "block";
+      break;
+    case "new-note":
+      state.selectedView = { name: "new-note" };
+      // document.querySelector("#new-note-view").classList.remove("hidden");
+      document.querySelector("#new-note-view").style.display = "block";
+      break;
+    default:
+      break;
+  }
+}
 
+// COMPONENTS ----------------------------------------------
+
+class RecentNotes extends HTMLElement {
+  set notes(value) {
+    this._notes = value;
+    this.updateComponent();
+  }
+
+  get notes() {
+    return this._notes;
+  }
+
+  connectedCallback() {
+    this.updateComponent();
+  }
+
+  updateComponent() {
+    // Fetch recent notes and render them
+    const notes = getAllNotes();
+    this.innerHTML = notes
+      .map(
+        (note) => `
+          <p><strong>${note.contact}</strong> <time>${formatDate(
+            note.date
+          )}</time> <em>${note.type}</em></p>
+            <p>${note.text}</p>
+        `
+      )
+      .join("");
+  }
+}
+customElements.define("recent-notes", RecentNotes);
