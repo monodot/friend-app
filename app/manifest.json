@@ -2,7 +2,7 @@
   "name": "Friend App",
   "short_name": "FriendApp",
   "description": "A simple, secure app to keep track of your friends, remember conversations and build better connections.",
-  "start_url": "/",
+  "start_url": "https://monodot.github.io/friend-app",
   "theme_color": "#BEA7E5",
   "background_color": "#F8F4F9",
   "display": "standalone",
