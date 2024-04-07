@@ -7,7 +7,7 @@ body {
   margin: 0;
   padding: 0;
   font-size: 1.15rem;
-  background-color: #EEEEEE;
+  background-color: #FFFFFF;
 }
 a {
   color: #007AFF;
@@ -15,22 +15,51 @@ a {
 }
 main {
   margin: 0 auto;
+}
+div.view {
   padding: 1rem;
+  min-height: 100vh;
 }
-header {
+div.popover-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100vh;
+  z-index: 100;
+  background: rgb(0,0,0,0.5);
+  padding-top: 3rem;
+}
+div.popover-view > div {
+  background: #FFFFFF;
+  min-height: 100vh;
+  padding: 1rem;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+}
+nav.sheet-actions {
   display: flex;
-  align-items: baseline;
   justify-content: space-between;
-  margin: 0 0 2rem 0;
+  align-items: center;
 }
-header.title-with-left-link {
-  justify-content: space-between;
+nav.sheet-actions button {
+  background: none;
+  font-weight: bold;
+  border: none;
+  color: #007AFF;
+
+  /* padding: 0.5rem 1rem; */
+  /* border-radius: 0.5rem; */
+  /* border-width: 0; */
 }
+
 header h1 {
-  margin: 1rem 0 0 0;
+  margin: 1rem 0 2rem 0;
   padding: 0;
-  /* font-size: 1.5rem; */
-  /* color: #6B4B3E; */
+}
+header h3 {
+  margin: 0;
+  padding: 0;
 }
 ul {
   padding: 0;
@@ -60,4 +89,37 @@ section#recent-notes li {
 }
 li:nth-of-type(even) {
   background-color: inherit;
+}
+
+
+div.friend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+div.friend-grid > div {
+  background-color: #FFFFFF;
+  border-radius: 1rem;
+  border-width: 0;
+  text-align: center;
+}
+
+div#contact-view {
+  background: #EEEEEE;
+}
+div.contact-details header h2 {
+  text-align: center;
+  font-size: 2rem;
+}
+
+div.notes-list > div {
+  padding: 0.75rem 0.75rem 0.75rem 2rem;
+  background-color: #FFFFFF;
+  border-radius: 0.5rem;
+  border-width: 0;
+  margin: 0.5rem 0;
+}
+div.notes-list > div > p {
+  margin: 0.25rem 0;
 }

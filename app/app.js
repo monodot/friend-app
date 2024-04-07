@@ -1,3 +1,5 @@
+"use strict";
+
 // Add the storage key as an app-wide constant
 const STORAGE_KEY = "friend-app-notes";
 
@@ -14,18 +16,6 @@ const noteTypeSelectE = document.getElementById("note-type");
 const noteTextInputE = document.getElementById("note-text");
 
 const canvasContainer = document.getElementById("canvas");
-
-const newNoteLink = document.getElementById("new-note-link");
-newNoteLink.addEventListener("click", (event) => {
-  event.preventDefault();
-  navigateToView({ name: "new-note" });
-});
-document.querySelectorAll(".home-link").forEach((link) => {
-  link.addEventListener("click", (event) => {
-    event.preventDefault();
-    navigateToView({ name: "home" });
-  });
-});
 
 // Listen to form submissions.
 newNoteFormE.addEventListener("submit", (event) => {
@@ -52,13 +42,13 @@ newNoteFormE.addEventListener("submit", (event) => {
   storeNewNote(note);
 
   // Refresh the UI.
-  const recentNotesElement = document.querySelector('recent-notes');
-  recentNotesElement.notes = getAllNotes();
+  const notesListElement = document.querySelector('notes-list');
+  notesListElement.updateComponent();
 
   // Reset the form.
   newNoteFormE.reset();
 
-  navigateToView({ name: "home" });
+  hidePopover();
 });
 
 function storeNewNote(note) {
@@ -127,7 +117,6 @@ function formatDate(dateString) {
 
 function navigateToView(target) {
   const { name, params } = target;
-  // alert('ya clicked it!');
   // Hide all views
   document.querySelectorAll("main > *").forEach((view) => {
     view.style.display = "none";
@@ -143,10 +132,38 @@ function navigateToView(target) {
       // document.querySelector("#new-note-view").classList.remove("hidden");
       document.querySelector("#new-note-view").style.display = "block";
       break;
+    case "contact":
+      state.selectedView = { name: "contact", params };
+      document.querySelector("#contact-view").style.display = "block";
+      const contactDetails = document.querySelector("contact-details");
+      contactDetails.name = params.name; // update the displayed contact
+      break;
     default:
       break;
   }
 }
+
+function showPopover() {
+  document.querySelector("#edit-note-view").style.display = "block";
+}
+function hidePopover() {
+  document.querySelector("#edit-note-view").style.display = "none";
+}
+
+
+
+// STATE ----------------------------------------------
+
+function getFriends() {
+  return [
+    { name: "Alice" },
+    { name: "Bob" },
+    { name: "Charlie" },
+    { name: "David" },
+  ];
+}
+
+
 
 // COMPONENTS ----------------------------------------------
 
@@ -180,3 +197,68 @@ class RecentNotes extends HTMLElement {
   }
 }
 customElements.define("recent-notes", RecentNotes);
+
+class FriendsCircle extends HTMLElement {
+  connectedCallback() {
+    this.updateComponent();
+  }
+
+  updateComponent() {
+    // Fetch friends and render them
+    const friends = getFriends();
+    this.innerHTML = `<div class="friend-grid">${friends
+      .map((friend) => `<div>
+        <a href="#" onclick="navigateToView({ name: 'contact', params: { name: '${friend.name}' }}); return false;">
+          <svg viewBox="0 0 86 86" style="width:80%;"><ellipse style="fill:#FFD6AF;" cx="43" cy="43" rx="40" ry="40"></ellipse>
+          </svg>
+          <p style="margin:0.5rem 0">${friend.name}</p>
+        </a></div>`)
+      .join("")}</div>`;
+  }
+}
+customElements.define("friends-circle", FriendsCircle);
+
+class ContactDetails extends HTMLElement {
+  set name(value) {
+    this._name = value;
+    this.updateComponent();
+  }
+
+  get name() {
+    return this._name;
+  }
+
+  connectedCallback() {
+    this.updateComponent();
+  }
+
+  updateComponent() {
+    // Fetch contact and render them
+    this.innerHTML = `<div class="contact-details">
+      <header><h2>${this.name}</h2>
+      </div>`;
+  }
+}
+customElements.define("contact-details", ContactDetails);
+
+class NotesList extends HTMLElement {
+  connectedCallback() {
+    this.updateComponent();
+  }
+
+  updateComponent() {
+    // Fetch notes and render them
+    const notes = getAllNotes();
+    this.innerHTML = `<div class="notes-list">${notes
+      .map(
+        (note) => `<div>
+          <p><strong>${note.contact}</strong> <time>${formatDate(
+            note.date
+          )}</time> <em>${note.type}</em></p>
+            <p>${note.text}</p>
+        </div>`
+      )
+      .join("")}</div>`;
+  }
+}
+customElements.define("notes-list", NotesList);
