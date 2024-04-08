@@ -61,6 +61,11 @@ header h3 {
   margin: 0;
   padding: 0;
 }
+header p {
+  margin: 0;
+  padding: 0;
+}
+
 ul {
   padding: 0;
 }
