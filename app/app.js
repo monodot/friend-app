@@ -1,11 +1,95 @@
+// import getDbClient from './dbClient.js';
+
 "use strict";
 
 // Add the storage key as an app-wide constant
 const STORAGE_KEY = "friend-app-notes";
+const DATABASE_NAME = "friendapp";
+const FRIENDS_TABLE_NAME = "friends";
+const NOTES_TABLE_NAME = "notes";
+const DB_VERSION = 1;
 
 let state = {
   selectedView: { name: "home" },
 };
+
+let db;
+
+const dbPromise = new Promise((resolve, reject) => {
+  const openRequest = indexedDB.open(DATABASE_NAME, DB_VERSION);
+
+  openRequest.onupgradeneeded = function (e) {
+    // Perform database upgrade.
+    const db = e.target.result;
+    if (!db.objectStoreNames.contains(FRIENDS_TABLE_NAME)) {
+      const friends = db.createObjectStore(FRIENDS_TABLE_NAME, {
+        autoIncrement: true,
+      });
+      const notes = db.createObjectStore(NOTES_TABLE_NAME, {
+        autoIncrement: true,
+      });
+      notes.createIndex("name", "name", { unique: false });
+
+      friends.add({ name: "Alice" });
+      friends.add({ name: "Bob" });
+      friends.add({ name: "Charlie" });
+      friends.add({ name: "David" });
+
+      notes.add({
+        name: "Alice",
+        date: "2021-01-01",
+        type: "call",
+        text: "Called Alice",
+      });
+      notes.add({
+        name: "Alice",
+        date: "2021-01-02",
+        type: "meetup",
+        text: "Went for a drink at the cafe. Chatted about Hemingway.",
+      });
+      notes.add({
+        name: "Bob",
+        date: "2021-01-02",
+        type: "email",
+        text: "Emailed Bob",
+      });
+      notes.add({
+        name: "Charlie",
+        date: "2021-01-03",
+        type: "meeting",
+        text: "Met Charlie",
+      });
+      notes.add({
+        name: "David",
+        date: "2021-01-04",
+        type: "call",
+        text: "Called David",
+      });
+    }
+  };
+
+  openRequest.onsuccess = function (e) {
+    db = e.target.result;
+    resolve(db);
+  };
+
+  openRequest.onerror = function (e) {
+    console.error("IndexedDB error:", e.target.errorCode);
+    reject(e.target.errorCode);
+  };
+});
+
+async function initData() {
+  try {
+    const circle = document.querySelector("friends-circle");
+    circle.friends = await getFriends();
+  } catch (error) {
+    console.error("Could not initialize database:", error);
+    // Handle failure: Maybe fallback to a different storage or notify the user
+  }
+}
+
+initData();
 
 // create constants for the form and the form controls
 const recentNotesContainer = document.getElementById("recent-notes");
@@ -42,7 +126,7 @@ newNoteFormE.addEventListener("submit", (event) => {
   storeNewNote(note);
 
   // Refresh the UI.
-  const notesListElement = document.querySelector('notes-list');
+  const notesListElement = document.querySelector("notes-list");
   notesListElement.updateComponent();
 
   // Reset the form.
@@ -62,48 +146,13 @@ function storeNewNote(note) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
 }
 
-function getAllNotes() {
-  // Get the string of notes from localStorage
-  const data = window.localStorage.getItem(STORAGE_KEY);
-
-  // If no notes were stored, default to an empty array
-  // otherwise, return the stored data as parsed JSON
-  const notes = data ? JSON.parse(data) : [];
-
-  return notes;
-}
-
-function renderRecentNotes() {
-  // get the parsed string of notes, or an empty array.
-  const notes = getAllNotes();
-
-  // exit if there are no notes
-  if (notes.length === 0) {
-    return;
-  }
-
-  // Clear the list of past notes, since we're going to re-render it.
-  recentNotesContainer.innerHTML = "";
-
-  const recentNotesHeader = document.createElement("h2");
-  recentNotesHeader.textContent = "Recent notes";
-
-  const recentNotesList = document.createElement("ul");
-
-  // Loop over all notes and render them.
-  notes.forEach((note) => {
-    const noteEl = document.createElement("li");
-    // TODO Fix horrible security hole of rendering unsanitized HTML
-    noteEl.innerHTML = `
-      <p><strong>${note.contact}</strong> <time>${formatDate(
-      note.date
-    )}</time> <em>${note.type}</em></p>
-      <p>${note.text}</p>`;
-    recentNotesList.appendChild(noteEl);
-  });
-
-  recentNotesContainer.appendChild(recentNotesHeader);
-  recentNotesContainer.appendChild(recentNotesList);
+function showError(message) {
+  const errorElement = document.createElement("p");
+  errorElement.textContent = message;
+  errorElement.style.color = "red";
+  const errorBanner = document.querySelector("#error-banner");
+  errorBanner.appendChild(errorElement);
+  errorBanner.style.display = "block";
 }
 
 function formatDate(dateString) {
@@ -115,10 +164,10 @@ function formatDate(dateString) {
   return date.toLocaleDateString("en-US", { timeZone: "UTC" });
 }
 
-function navigateToView(target) {
+async function navigateToView(target) {
   const { name, params } = target;
   // Hide all views
-  document.querySelectorAll("main > *").forEach((view) => {
+  document.querySelectorAll("main > div.view").forEach((view) => {
     view.style.display = "none";
   });
   switch (name) {
@@ -133,10 +182,14 @@ function navigateToView(target) {
       document.querySelector("#new-note-view").style.display = "block";
       break;
     case "contact":
-      state.selectedView = { name: "contact", params };
-      document.querySelector("#contact-view").style.display = "block";
+      const notes = await getNotesForUser(params.name);
       const contactDetails = document.querySelector("contact-details");
       contactDetails.name = params.name; // update the displayed contact
+      const notesList = document.querySelector("notes-list");
+      notesList.notes = notes;
+
+      state.selectedView = { name: "contact", params };
+      document.querySelector("#contact-view").style.display = "block";
       break;
     default:
       break;
@@ -150,20 +203,57 @@ function hidePopover() {
   document.querySelector("#edit-note-view").style.display = "none";
 }
 
-
-
 // STATE ----------------------------------------------
 
-function getFriends() {
-  return [
-    { name: "Alice" },
-    { name: "Bob" },
-    { name: "Charlie" },
-    { name: "David" },
-  ];
+async function getNotesForUser(name) {
+  try {
+    const db = await dbPromise;
+    const transaction = db.transaction(NOTES_TABLE_NAME, "readonly");
+    const store = transaction.objectStore(NOTES_TABLE_NAME);
+    // const index = store.index("name");
+    const request = store.index("name").getAll(name);
+
+    // Return a Promise so the caller can await it
+    return new Promise((resolve, reject) => {
+      request.onsuccess = function (event) {
+        const notes = event.target.result;
+        resolve(notes);
+      };
+      request.onerror = function (event) { //  THIS SEEMS WRONG
+        reject("Error getting notes");
+      };
+    });
+  } catch (error) {
+    console.error("Could not initialize database:", error);
+    showError("No database connection.");
+    return [];
+  }
 }
 
+async function getFriends() {
+  try {
+    const db = await dbPromise;
+    const transaction = db.transaction(FRIENDS_TABLE_NAME, "readonly");
+    const store = transaction.objectStore(FRIENDS_TABLE_NAME);
+    const request = store.getAll();
 
+    // Return a Promise so the caller can await it
+    return new Promise((resolve, reject) => {
+      request.onsuccess = function (event) {
+        const friends = event.target.result;
+        resolve(friends);
+      };
+      request.onerror = function (event) {
+        reject("Error getting friends");
+      };
+    });
+  } catch (error) {
+    console.error("Could not initialize database:", error);
+    // Handle failure: Maybe fallback to a different storage or notify the user
+    showError("No database connection.");
+    return [];
+  }
+}
 
 // COMPONENTS ----------------------------------------------
 
@@ -182,14 +272,15 @@ class RecentNotes extends HTMLElement {
   }
 
   updateComponent() {
-    // Fetch recent notes and render them
-    const notes = getAllNotes();
-    this.innerHTML = notes
+    if (!this.notes) {
+      return;
+    }
+    this.innerHTML = this.notes
       .map(
         (note) => `
           <p><strong>${note.contact}</strong> <time>${formatDate(
-            note.date
-          )}</time> <em>${note.type}</em></p>
+          note.date
+        )}</time> <em>${note.type}</em></p>
             <p>${note.text}</p>
         `
       )
@@ -199,20 +290,32 @@ class RecentNotes extends HTMLElement {
 customElements.define("recent-notes", RecentNotes);
 
 class FriendsCircle extends HTMLElement {
+  set friends(value) {
+    this._friends = value;
+    this.updateComponent();
+  }
+
+  get friends() {
+    return this._friends;
+  }
+
   connectedCallback() {
     this.updateComponent();
   }
 
-  updateComponent() {
-    // Fetch friends and render them
-    const friends = getFriends();
-    this.innerHTML = `<div class="friend-grid">${friends
-      .map((friend) => `<div>
+  async updateComponent() {
+    if (!this.friends) {
+      return;
+    }
+    this.innerHTML = `<div class="friend-grid">${this.friends
+      .map(
+        (friend) => `<div>
         <a href="#" onclick="navigateToView({ name: 'contact', params: { name: '${friend.name}' }}); return false;">
           <svg viewBox="0 0 86 86" style="width:80%;"><ellipse style="fill:#FFD6AF;" cx="43" cy="43" rx="40" ry="40"></ellipse>
           </svg>
           <p style="margin:0.5rem 0">${friend.name}</p>
-        </a></div>`)
+        </a></div>`
+      )
       .join("")}</div>`;
   }
 }
@@ -233,7 +336,6 @@ class ContactDetails extends HTMLElement {
   }
 
   updateComponent() {
-    // Fetch contact and render them
     this.innerHTML = `<div class="contact-details">
       <header><h2>${this.name}</h2>
       </div>`;
@@ -242,19 +344,29 @@ class ContactDetails extends HTMLElement {
 customElements.define("contact-details", ContactDetails);
 
 class NotesList extends HTMLElement {
+  set notes(value) {
+    this._notes = value;
+    this.updateComponent();
+  }
+
+  get notes() {
+    return this._notes;
+  }
+
   connectedCallback() {
     this.updateComponent();
   }
 
   updateComponent() {
-    // Fetch notes and render them
-    const notes = getAllNotes();
-    this.innerHTML = `<div class="notes-list">${notes
+    if (!this.notes) {
+      return;
+    }
+    this.innerHTML = `<div class="notes-list">${this.notes
       .map(
         (note) => `<div>
           <p><strong>${note.contact}</strong> <time>${formatDate(
-            note.date
-          )}</time> <em>${note.type}</em></p>
+          note.date
+        )}</time> <em>${note.type}</em></p>
             <p>${note.text}</p>
         </div>`
       )
