@@ -8,6 +8,7 @@ body {
   padding: 0;
   font-size: 1.15rem;
   background-color: #FFFFFF;
+  -webkit-tap-highlight-color: transparent;
 }
 a {
   color: #007AFF;
