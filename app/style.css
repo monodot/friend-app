@@ -66,6 +66,9 @@ header.three-column {
   display: flex;
   justify-content: space-between;
 }
+header.three-column p.title {
+  font-weight: 700;
+}
 header p {
   margin: 0;
 }

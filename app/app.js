@@ -62,9 +62,26 @@ async function renderContact(app, params) {
   
   app.innerHTML = `
 <header class="sticky three-column">
-  <p class=""><a href="#" class="home-link">&lt;&lt;</a></p>
-  <p class=""><strong>Friend</strong></p>
-  <p class="">...</p>
+  <p class="nav"><a href="#" class="home-link">
+    <svg
+      role="img"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="24px"
+      height="24px"
+    >
+      <path
+        fill="none"
+        stroke="#1768AC"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M5 12h14M5 12l4 4m-4-4l4-4"
+      />
+    </svg>
+  </a></p>
+  <p class="title">Friend</p>
+  <p class="context">...</p>
 </header>
 <div class="view">
   <section id="contact-details">
@@ -308,6 +325,21 @@ class ContactDetails extends HTMLElement {
 }
 customElements.define("contact-details", ContactDetails);
 
+/*
+            <svg
+              role="img"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="24px"
+              height="24px"
+            >
+              <path
+                fill="#000000"
+                d="M21 16.42v3.536a1 1 0 0 1-.93.998c-.437.03-.794.046-1.07.046c-8.837 0-16-7.163-16-16c0-.276.015-.633.046-1.07A1 1 0 0 1 4.044 3H7.58a.5.5 0 0 1 .498.45c.023.23.044.413.064.552A13.901 13.901 0 0 0 9.35 8.003c.095.2.033.439-.147.567l-2.158 1.542a13.047 13.047 0 0 0 6.844 6.844l1.54-2.154a.462.462 0 0 1 .573-.149a13.897 13.897 0 0 0 4 1.205c.139.02.322.041.55.064a.5.5 0 0 1 .449.498"
+              />
+            </svg>
+*/
+
 class NotesList extends HTMLElement {
   set notes(value) {
     this._notes = value;
@@ -338,13 +370,13 @@ class NotesList extends HTMLElement {
             <svg
               role="img"
               xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
+              viewBox="0 0 256 256"
               width="24px"
               height="24px"
             >
               <path
-                fill="#000000"
-                d="M21 16.42v3.536a1 1 0 0 1-.93.998c-.437.03-.794.046-1.07.046c-8.837 0-16-7.163-16-16c0-.276.015-.633.046-1.07A1 1 0 0 1 4.044 3H7.58a.5.5 0 0 1 .498.45c.023.23.044.413.064.552A13.901 13.901 0 0 0 9.35 8.003c.095.2.033.439-.147.567l-2.158 1.542a13.047 13.047 0 0 0 6.844 6.844l1.54-2.154a.462.462 0 0 1 .573-.149a13.897 13.897 0 0 0 4 1.205c.139.02.322.041.55.064a.5.5 0 0 1 .449.498"
+                fill="#1768AC"
+                d="m235.32 81.37l-60.69-60.68a16 16 0 0 0-22.63 0l-53.63 53.8c-10.66-3.34-35-7.37-60.4 13.14a16 16 0 0 0-1.29 23.78L85 159.71l-42.66 42.63a8 8 0 0 0 11.32 11.32L96.29 171l48.29 48.29A16 16 0 0 0 155.9 224h1.13a15.93 15.93 0 0 0 11.64-6.33c19.64-26.1 17.75-47.32 13.19-60L235.33 104a16 16 0 0 0-.01-22.63M224 92.69l-57.27 57.46a8 8 0 0 0-1.49 9.22c9.46 18.93-1.8 38.59-9.34 48.62L48 100.08c12.08-9.74 23.64-12.31 32.48-12.31A40.13 40.13 0 0 1 96.81 91a8 8 0 0 0 9.25-1.51L163.32 32L224 92.68Z"
               />
             </svg>
           </div>
