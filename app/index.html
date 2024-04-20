@@ -10,11 +10,14 @@
     <link rel="icon" href="icons/app.svg" />
   </head>
   <body>
+    <div id="app"></div>
+
+
     <main id="canvas">
       <div class="banner" id="error-banner" style="display: none">
         <p></p>
       </div>
-      <div class="view" id="home-view">
+      <div class="view" id="home-view" style="display: none">
         <header>
           <h1>Friends</h1>
         </header>
@@ -30,44 +33,21 @@
           <contact-details></contact-details>
         </section>
         <section id="contact-notes">
-          <a href="#" onclick="showPopover(); return false;">Add new note</a>
+          <!-- <a href="#" onclick="showPopover(); return false;">Add new note</a> -->
+          <a href="#" onclick="navigateToView({ name: 'home' }); return false;">Add new note</a>
           <notes-list></notes-list>
         </section>
       </div>
       <div class="popover-view" id="edit-note-view" style="display: none">
         <div>
-          <form>
-            <nav class="sheet-actions">
-              <a href="#" onclick="hidePopover(); return false;">Cancel</a>
-              <button type="submit">Save</button>
-            </nav>
-            <p>
-              <label for="contact">Contact</label>
-              <input type="text" id="note-contact" required />
-            </p>
-            <p>
-              <label for="date">Date</label>
-              <input type="date" id="note-date" required />
-            </p>
-            <p>
-              <label for="type">Type</label>
-              <select id="note-type" required>
-                <option value="">Select a type</option>
-                <option value="phone">Phone call</option>
-                <option value="meeting">Hang out</option>
-                <option value="update">Update</option>
-              </select>
-            </p>
-            <p>
-              <label for="note">Note</label>
-            </p>
-            </p>
-              <textarea id="note-text" required></textarea>
-            </p>
-          </form>
+          <new-note-form></new-note-form>
+
         </div>
       </div>
     </main>
+    <script src="vendor/pouchdb.min.js"></script>
+    <!-- curl -OL https://github.com/pouchdb/pouchdb/releases/download/8.0.1/pouchdb.find.min.js -->
+    <!-- <script src="pouchdb.find.min.js"></script> -->
     <script src="app.js" defer></script>
   </body>
 </html>
