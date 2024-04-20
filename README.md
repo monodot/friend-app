@@ -1,9 +1,11 @@
 # mainmates
 
-A personal, private social network that helps you to connect better to the people who matter to you.
+**NOTICE: This is alpha software, and I'm working towards a 1.0 public release. There is currently no sync or backup feature, and the app will change a lot before it gets to 1.0. Until the 1.0 release, you're advised _not_ to enter any data into this app which you're not prepared to lose.**
+
+A personal, private social app that helps you to make stronger connections with the people who matter in your life.
 
 - Offline-first
-- Progressive Web App (PWA)
+- Cross-platform Progressive Web App (PWA)
 - Online sync support (coming soon)
 
 ## Take it for a test-drive
