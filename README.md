@@ -1,12 +1,21 @@
 # mainmates
 
-**NOTICE: This is alpha software, and I'm working towards a 1.0 public release. There is currently no sync or backup feature, and the app will change a lot before it gets to 1.0. Until the 1.0 release, you're advised _not_ to enter any data into this app which you're not prepared to lose.**
+_mainmates_ is a personal, private social app that helps you feel better connected to the people who matter in your life.
 
-A personal, private social app that helps you to make stronger connections with the people who matter in your life.
-
-- Offline-first
-- Cross-platform Progressive Web App (PWA)
+- Keep track of life events and conversations with your friends and family
+- Offline-first; no requirement to sign up or share your details with anyone
+- Runs on any browser, desktop or mobile
 - Online sync support (coming soon)
+
+**WARNING: This is alpha software, and I'm working towards a 1.0 public release. There is currently no sync or backup feature, and the app will change a lot before it gets to 1.0, which may result in loss of your data. Until the 1.0 release, you're advised _not_ to enter any data into this app which you're not prepared to lose.**
+
+What's been done / what's to be done:
+
+- [x] Show friends list
+- [x] Add a data access layer that supports future syncing (Pouch DB)
+- [x] Add a friend feature
+- [x] Add a note feature
+- [ ] Add export feature
 
 ## Take it for a test-drive
 
