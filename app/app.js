@@ -61,10 +61,12 @@ async function renderContact(app, params) {
   const notes = await getContactNotes(params);
   
   app.innerHTML = `
+<header class="sticky three-column">
+  <p class=""><a href="#" class="home-link">&lt;&lt;</a></p>
+  <p class=""><strong>Friend</strong></p>
+  <p class="">...</p>
+</header>
 <div class="view">
-  <header class="title-with-left-link">
-    <p><a href="#" class="home-link">&lt; Friends</a></p>
-  </header>
   <section id="contact-details">
     <contact-details></contact-details>
   </section>
@@ -101,8 +103,8 @@ async function renderContactAddNote(app, params) {
     const contactId = params; //  just the "contact_xxx" id 
     const body = document.getElementById("note-body");
     addNote(contactId, body.value)
-      .then(() => alert('note added!'))
-      .catch(() => alert('failed to add note'));
+      .then(() => {})
+      .catch(() => console.error("Failed to add note"));
     window.location.hash = `#contacts/${params}`;
   });
 }
@@ -124,8 +126,8 @@ async function renderAddContact(app, params) {
     event.preventDefault();
     const name = document.getElementById("contact-name");
     addFriend(name.value)
-      .then(() => alert('added!'))
-      .catch(() => alert('failed!'));
+      .then(() => {})
+      .catch(() => console.error("Failed ot add contact"));
     window.location.hash = "#"; // go to home page
   });
 }
@@ -330,8 +332,29 @@ class NotesList extends HTMLElement {
     // )}</time> <em>${note.doc.type}</em></p>
     this.innerHTML = `<div class="notes-list">${this.notes
       .map(
-        (note) => `<div>
+        (note) => `
+        <div class="notes-note">
+          <div class="note-icon">
+            <svg
+              role="img"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="24px"
+              height="24px"
+            >
+              <path
+                fill="#000000"
+                d="M21 16.42v3.536a1 1 0 0 1-.93.998c-.437.03-.794.046-1.07.046c-8.837 0-16-7.163-16-16c0-.276.015-.633.046-1.07A1 1 0 0 1 4.044 3H7.58a.5.5 0 0 1 .498.45c.023.23.044.413.064.552A13.901 13.901 0 0 0 9.35 8.003c.095.2.033.439-.147.567l-2.158 1.542a13.047 13.047 0 0 0 6.844 6.844l1.54-2.154a.462.462 0 0 1 .573-.149a13.897 13.897 0 0 0 4 1.205c.139.02.322.041.55.064a.5.5 0 0 1 .449.498"
+              />
+            </svg>
+          </div>
+          <div class="note-content">
+            <header class="note-meta">
+              <p>(meta)</p>
+              <p>(date)</p>
+            </header>
             <p>${note.doc.body}</p>
+          </div>
         </div>`
       )
       .join("")}</div>`;

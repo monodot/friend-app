@@ -9,6 +9,7 @@ body {
   font-size: 1.15rem;
   background-color: #FFFFFF;
   -webkit-tap-highlight-color: transparent;
+  --secondary-text: #334155;
 }
 a {
   color: #007AFF;
@@ -18,8 +19,8 @@ main {
   margin: 0 auto;
 }
 div.view {
-  padding: 1rem;
   min-height: 100vh;
+  background: #f1f5f9;
 }
 div.popover-view {
   position: absolute;
@@ -54,6 +55,20 @@ nav.sheet-actions button {
   /* border-width: 0; */
 }
 
+header.sticky {
+  position: sticky;
+  top: 0;
+  padding: 0.75rem;
+  border-bottom: solid 1px #cbd5e1;
+  background: #ffffff;
+}
+header.three-column {
+  display: flex;
+  justify-content: space-between;
+}
+header p {
+  margin: 0;
+}
 header h1 {
   margin: 1rem 0 2rem 0;
   padding: 0;
@@ -62,10 +77,10 @@ header h3 {
   margin: 0;
   padding: 0;
 }
-header p {
+/* header p {
   margin: 0;
   padding: 0;
-}
+} */
 
 ul {
   padding: 0;
@@ -85,6 +100,9 @@ textarea {
   border-width: 0;
   background-color: #FFFFFF;
   box-sizing: border-box;
+}
+section#contact-details {
+  padding: 1rem 0.75rem;
 }
 section#recent-notes li {
   padding: 0.5rem 1rem;
@@ -119,13 +137,28 @@ div.contact-details header h2 {
   font-size: 2rem;
 }
 
-div.notes-list > div {
-  padding: 0.75rem 0.75rem 0.75rem 2rem;
-  background-color: #FFFFFF;
-  border-radius: 0.5rem;
-  border-width: 0;
-  margin: 0.5rem 0;
+div.notes-list > div:first-child {
+  border-top: solid 1px #cbd5e1;
 }
-div.notes-list > div > p {
+div.notes-list > div {
+  padding: 0.75rem 0.75rem 0.75rem 0.75rem;
+  background-color: #FFFFFF;
+  border-bottom: solid 1px #cbd5e1;
+}
+div.note-content p {
   margin: 0.25rem 0;
+}
+div.notes-note {
+  display: flex;
+}
+div.note-content {
+  flex: 1 1 0%;
+}
+div.notes-note > div > header.note-meta {
+  display: flex;
+  justify-content: space-between;
+}
+div.notes-note > div > div > header.note-meta p {
+  margin: 0;
+  color: var(--secondary-text);
 }
