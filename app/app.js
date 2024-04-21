@@ -29,7 +29,6 @@ const defaultRouteHandler = renderHome;
 
 async function navigateToView() {
   let hash = window.location.hash.split("#");
-  console.log(hash);
   let app = document.getElementById("app");
   
   // Default route
@@ -66,9 +65,9 @@ async function renderContact(app, params) {
     <svg
       role="img"
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="24px"
-      height="24px"
+      viewBox="0 0 22 22"
+      width="22px"
+      height="22px"
     >
       <path
         fill="none"
@@ -80,15 +79,30 @@ async function renderContact(app, params) {
       />
     </svg>
   </a></p>
-  <p class="title">Friend</p>
+  <p class="title">${contact.short_name}</p>
   <p class="context">...</p>
 </header>
 <div class="view">
-  <section id="contact-details">
-    <contact-details></contact-details>
-  </section>
   <section id="contact-notes">
-    <a href="#contacts/${params}/notes/add">Add new note</a>
+    <p class="add-thing"><a href="#contacts/${params}/notes/add">
+      <svg
+        role="img"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 512 512"
+        width="24px"
+        height="24px"
+      >
+        <path
+          fill="none"
+          stroke="#007AFF"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="32"
+          d="M256 112v288m144-144H112"
+        />
+      </svg>
+      Add new note
+    </a></p>
     <notes-list></notes-list>
   </section>
 </div>
@@ -160,10 +174,41 @@ async function renderHome(app) {
   <section id="inner-circle">
     <friends-circle></friends-circle>
   </section>
+  <p><a href="#" onClick="doExport();">Export</a></p>
 </div>
   `;
   const circle = document.querySelector("friends-circle");
   circle.friends = await getFriends();
+}
+
+async function doExport() {
+  let friends = await getFriends();
+  let blob = new Blob([JSON.stringify(friends)], {
+    type: 'application/json'
+  });
+  let title = "mainmates Export";
+  let files = [blob];
+
+  const data = {title, files};
+
+  try {
+    await navigator.share(data);
+  }
+  catch(e) {
+    alert('share error', e);
+  }
+  
+  // const blobUrl = URL.createObjectURL(blob);
+  // const a = document.createElement('a');
+  // a.href = blobUrl;
+  // a.download = "export.json";
+  // a.style.display = "none";
+  // document.body.append(a);
+  // a.click();
+  // setTimeout(() => {
+  //   URL.revokeObjectURL(blobUrl);
+  //   a.remove();
+  // }, 1000);
 }
 
 window.addEventListener("hashchange", navigateToView);
@@ -194,7 +239,7 @@ function formatDate(dateString) {
 
   // Format the date into a locale-specific string.
   // include your locale for better user experience
-  return date.toLocaleDateString("en-US", { timeZone: "UTC" });
+  return date.toLocaleDateString(undefined, { timeZone: "UTC" });
 }
 
 
@@ -257,10 +302,12 @@ async function addFriend(name) {
 
 async function addNote(contactId, body) {
   const id = new Date().getTime();
+  const time = new Date().getTime();
   try {
     let result = await db.put({
       _id: `note_${contactId}_${id}`,
-      body
+      body,
+      time
     });
     return result;
   } catch (err) {
@@ -362,17 +409,17 @@ class NotesList extends HTMLElement {
     // <p><time>${formatDate(
     //   note.doc.date
     // )}</time> <em>${note.doc.type}</em></p>
-    this.innerHTML = `<div class="notes-list">${this.notes
+    this.innerHTML = `<div class="note-list">${this.notes
       .map(
         (note) => `
-        <div class="notes-note">
+        <div class="note-note">
           <div class="note-icon">
             <svg
               role="img"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 256 256"
-              width="24px"
-              height="24px"
+              width="20px"
+              height="20px"
             >
               <path
                 fill="#1768AC"
@@ -381,10 +428,10 @@ class NotesList extends HTMLElement {
             </svg>
           </div>
           <div class="note-content">
-            <header class="note-meta">
-              <p>(meta)</p>
-              <p>(date)</p>
-            </header>
+            <div class="note-meta">
+              <p>Note</p>
+              <p>${formatDate(note.doc.time)}</p>
+            </div>
             <p>${note.doc.body}</p>
           </div>
         </div>`
