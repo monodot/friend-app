@@ -215,7 +215,7 @@ async function renderHome(app) {
   const list = document.querySelector("friends-list");
   list.friends = await getFriends();
 
-  const expLink = document.getElementById("##");
+  const expLink = document.getElementById("export-link");
   expLink.textContent = webShareSupported ? 'Share data' : 'Download data';
 }
 
