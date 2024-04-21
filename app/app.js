@@ -26,6 +26,8 @@ const routes = [
 ]
 const defaultRouteHandler = renderHome;
 
+const webShareSupported = 'canShare' in navigator;
+
 
 async function navigateToView() {
   let hash = window.location.hash.split("#");
@@ -206,50 +208,57 @@ async function renderHome(app) {
         d="M13 5.828V17h-2V5.828L7.757 9.071L6.343 7.657L12 2l5.657 5.657l-1.414 1.414zM4 16h2v4h12v-4h2v4c0 1.1-.9 2-2 2H6c-1.1 0-2-.963-2-2z"
       />
     </svg>
-    Export data
+    <span id="export-link">Export data</span>
   </a></p>
 </div>
   `;
   const list = document.querySelector("friends-list");
   list.friends = await getFriends();
+
+  const expLink = document.getElementById("##");
+  expLink.textContent = webShareSupported ? 'Share data' : 'Download data';
 }
 
-async function doExport() {
+async function shareOrDownload() {
   let friends = await getFriends();
   let blob = new Blob([JSON.stringify(friends)], {
     type: 'text/plain'
   });
-  let files = [
-    new File([blob], 'friends.txt', {
-      type: blob.type,
-    })
-  ];
-  let data = {
-    title: "mainmates Export",
-    files
+
+  if (webShareSupported) {
+    let files = [
+      new File([blob], 'friends.txt', {
+        type: blob.type,
+      })
+    ];
+    let data = {
+      title: "mainmates Export",
+      files
+    }
+
+    if (navigator.canShare(data)) {
+      try {
+        await navigator.share(data);
+      }
+      catch(e) {
+        alert(`share error - ${e}`);
+      } finally {
+        return;
+      }
+    }
   }
 
-  if (!navigator.canShare(data)) {
-    alert('Sharing is not supported in this browser.');
-  }
-  try {
-    await navigator.share(data);
-  }
-  catch(e) {
-    alert(`share error - ${e}`);
-  }
-  
-  // const blobUrl = URL.createObjectURL(blob);
-  // const a = document.createElement('a');
-  // a.href = blobUrl;
-  // a.download = "export.json";
-  // a.style.display = "none";
-  // document.body.append(a);
-  // a.click();
-  // setTimeout(() => {
-  //   URL.revokeObjectURL(blobUrl);
-  //   a.remove();
-  // }, 1000);
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = "export.json";
+  a.style.display = "none";
+  document.body.append(a);
+  a.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(blobUrl);
+    a.remove();
+  }, 1000);
 }
 
 window.addEventListener("hashchange", navigateToView);
