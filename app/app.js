@@ -194,7 +194,7 @@ async function renderHome(app) {
   <section id="friends-list">
     <friends-list></friends-list>
   </section>
-  <p class="add-thing"><a href="#" onClick="doExport();">
+  <p class="add-thing"><a href="#" onClick="shareOrDownload();">
     <svg
       role="img"
       xmlns="http://www.w3.org/2000/svg"
