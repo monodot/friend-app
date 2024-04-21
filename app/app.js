@@ -80,7 +80,7 @@ async function renderContact(app, params) {
     </svg>
   </a></p>
   <p class="title">${contact.short_name}</p>
-  <p class="context">...</p>
+  <p class="context">&nbsp;</p>
 </header>
 <div class="view">
   <section id="contact-notes">
@@ -166,33 +166,65 @@ async function renderAddContact(app, params) {
 async function renderHome(app) {
   console.log("ReNDERING HOME");
   app.innerHTML = `
+<header class="top-level">
+  <h1>Friends</h1>
+</header>
 <div class="view">
-  <header>
-    <h1>Friends</h1>
-  </header>
-  <p><a href="#contacts/add">Add friend</a></p>
-  <section id="inner-circle">
-    <friends-circle></friends-circle>
+  <p class="add-thing"><a href="#contacts/add">
+    <svg
+      role="img"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 512 512"
+      width="24px"
+      height="24px"
+    >
+      <path
+        fill="none"
+        stroke="#007AFF"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="32"
+        d="M256 112v288m144-144H112"
+      />
+    </svg>
+    Add friend
+  </a></p>
+  <section id="friends-list">
+    <friends-list></friends-list>
   </section>
-  <p><a href="#" onClick="doExport();">Export</a></p>
+  <p class="add-thing"><a href="#" onClick="doExport();">
+    <svg
+      role="img"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 22 22"
+      width="22px"
+      height="22px"
+    >
+      <path
+        fill="#007AFF"
+        fill-rule="evenodd"
+        d="M13 5.828V17h-2V5.828L7.757 9.071L6.343 7.657L12 2l5.657 5.657l-1.414 1.414zM4 16h2v4h12v-4h2v4c0 1.1-.9 2-2 2H6c-1.1 0-2-.963-2-2z"
+      />
+    </svg>
+    Export data
+  </a></p>
 </div>
   `;
-  const circle = document.querySelector("friends-circle");
-  circle.friends = await getFriends();
+  const list = document.querySelector("friends-list");
+  list.friends = await getFriends();
 }
 
 async function doExport() {
   let friends = await getFriends();
   let blob = new Blob([JSON.stringify(friends)], {
-    type: 'application/json'
+    type: 'text/plain'
   });
-  let title = "mainmates Export";
-  let files = [blob];
-
-  const data = {title, files};
 
   try {
-    await navigator.share(data);
+    await navigator.share({
+      title: "mainmates Export",
+      files: [blob]
+    });
   }
   catch(e) {
     alert(`share error - ${e}`);
@@ -318,7 +350,7 @@ async function addNote(contactId, body) {
 
 // COMPONENTS ----------------------------------------------
 
-class FriendsCircle extends HTMLElement {
+class FriendsList extends HTMLElement {
   set friends(value) {
     this._friends = value;
     this.updateComponent();
@@ -336,19 +368,18 @@ class FriendsCircle extends HTMLElement {
     if (!this.friends) {
       return;
     }
-    this.innerHTML = `<div class="friend-grid">${this.friends
+    this.innerHTML = `<ul class="friend-list">${this.friends
       .map(
-        (friend) => `<div>
-        <a href="#contacts/${friend.id}">
-          <svg viewBox="0 0 86 86" style="width:80%;"><ellipse style="fill:#e2e8f0;" cx="43" cy="43" rx="40" ry="40"></ellipse>
-          </svg>
-          <p style="margin:0.5rem 0">${friend.doc.short_name}</p>
-        </a></div>`
+        (friend) => `
+        <li>
+          <a href="#contacts/${friend.id}">${friend.doc.short_name}</a>
+        </li>`
       )
       .join("")}</div>`;
   }
 }
-customElements.define("friends-circle", FriendsCircle);
+customElements.define("friends-list", FriendsList);
+
 
 class ContactDetails extends HTMLElement {
   set name(value) {
@@ -372,20 +403,6 @@ class ContactDetails extends HTMLElement {
 }
 customElements.define("contact-details", ContactDetails);
 
-/*
-            <svg
-              role="img"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              width="24px"
-              height="24px"
-            >
-              <path
-                fill="#000000"
-                d="M21 16.42v3.536a1 1 0 0 1-.93.998c-.437.03-.794.046-1.07.046c-8.837 0-16-7.163-16-16c0-.276.015-.633.046-1.07A1 1 0 0 1 4.044 3H7.58a.5.5 0 0 1 .498.45c.023.23.044.413.064.552A13.901 13.901 0 0 0 9.35 8.003c.095.2.033.439-.147.567l-2.158 1.542a13.047 13.047 0 0 0 6.844 6.844l1.54-2.154a.462.462 0 0 1 .573-.149a13.897 13.897 0 0 0 4 1.205c.139.02.322.041.55.064a.5.5 0 0 1 .449.498"
-              />
-            </svg>
-*/
 
 class NotesList extends HTMLElement {
   set notes(value) {
@@ -406,9 +423,6 @@ class NotesList extends HTMLElement {
       return;
     }
     console.log(this.notes);
-    // <p><time>${formatDate(
-    //   note.doc.date
-    // )}</time> <em>${note.doc.type}</em></p>
     this.innerHTML = `<div class="note-list">${this.notes
       .map(
         (note) => `
