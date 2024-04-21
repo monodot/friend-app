@@ -216,18 +216,17 @@ async function renderHome(app) {
 
 async function doExport() {
   let friends = await getFriends();
+  let blob = new Blob([JSON.stringify(friends)], {
+    type: 'text/plain'
+  });
   let files = [
-    new File([JSON.stringify(friends), 'friends.txt', {
-      type: 'text/plain'
-    }])
+    new File([blob], 'friends.txt', {
+      type: blob.type,
+    })
   ];
 
-  // let blob = new Blob([JSON.stringify(friends)], {
-  //   type: 'text/plain'
-  // });
-
   if (!navigator.canShare(data)) {
-    alert('Sharing is not supported in this browser');
+    alert('Sharing is not supported in this browser.');
   }
   try {
     await navigator.share({
