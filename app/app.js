@@ -224,15 +224,16 @@ async function doExport() {
       type: blob.type,
     })
   ];
+  let data = {
+    title: "mainmates Export",
+    files
+  }
 
   if (!navigator.canShare(data)) {
     alert('Sharing is not supported in this browser.');
   }
   try {
-    await navigator.share({
-      title: "mainmates Export",
-      files
-    });
+    await navigator.share(data);
   }
   catch(e) {
     alert(`share error - ${e}`);
