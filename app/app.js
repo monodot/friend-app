@@ -195,7 +195,7 @@ async function doExport() {
     await navigator.share(data);
   }
   catch(e) {
-    alert('share error', e);
+    alert(`share error - ${e}`);
   }
   
   // const blobUrl = URL.createObjectURL(blob);
