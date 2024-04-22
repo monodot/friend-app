@@ -15,7 +15,10 @@ What's been done / what's to be done:
 - [x] Add a data access layer that supports future syncing (Pouch DB)
 - [x] Add a friend feature
 - [x] Add a note feature
-- [ ] Add export feature
+- [ ] Export friends and notes
+- [ ] Edit existing notes
+- [ ] Add spouse / children / pet information
+- [ ] First-time intro / onboarding flow
 
 ## Take it for a test-drive
 
