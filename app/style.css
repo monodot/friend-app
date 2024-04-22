@@ -24,7 +24,7 @@ main {
 }
 div.view {
   min-height: 100vh;
-  background: #f1f5f9;
+  background: #ffffff; /*#f1f5f9;*/
 }
 div.popover-view {
   position: absolute;
@@ -99,9 +99,9 @@ button {
 }
 textarea {
   font-size: inherit;
-  height: 8rem;
+  height: 12rem;
   width: 100%;
-  padding: 0.5rem;
+  padding: var(--margin-horizontal);
   border-radius: 0.5rem;
   border-width: 0;
   background-color: #FFFFFF;
@@ -122,6 +122,16 @@ li:nth-of-type(even) {
 }
 
 /* BUTTONS AND ACTIONS */
+button.fullwidth {
+  background: black;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  width: 100%;
+  border: 0;
+  font-weight: bold;
+  cursor: pointer;
+}
 p.add-thing {
   padding: 0.75rem var(--margin-horizontal);
   margin: 0;
@@ -148,6 +158,15 @@ ul.friend-list > li > a {
   border-bottom: solid 1px var(--border-light);
   color: var(--text-default);
 }
+form div.field-inline label {
+  padding: var(--margin-horizontal);
+  display: flex;
+  justify-content: space-between;
+}
+form div.form-actions {
+  padding: var(--margin-horizontal);
+}
+
 
 div#contact-view {
   background: #EEEEEE;
@@ -157,25 +176,27 @@ div.contact-details header h2 {
   font-size: 2rem;
 }
 
-div.note-list > div:first-child {
+ul.note-list > li:first-child {
   border-top: solid 1px var(--border-light);
 }
-div.note-list > div {
-  padding: 0.75rem 1rem 0.75rem 0.5rem;
+a.note-link {
   background-color: #FFFFFF;
-  border-bottom: solid 1px var(--border-light);
-}
-div.note-content p {
-  margin: 0.5rem 0 0.5rem 0;
-}
-div.note-note {
+  padding: 0.75rem 1rem 0.75rem 0.5rem;
   display: flex;
+  border-bottom: solid 1px var(--border-light);
+  color: inherit;
+}
+a.note-link:hover {
+  background: #eeeeee;
+}
+div.note-icon {
+  min-width: 25px; 
 }
 div.note-content {
   flex: 1 1 0%;
 }
-div.note-icon {
-  min-width: 25px; 
+div.note-content p {
+  margin: 0.5rem 0 0.5rem 0;
 }
 div.note-meta {
   display: flex;
@@ -186,12 +207,4 @@ div.note-meta p {
   color: var(--secondary-text);
   margin: 0;
   line-height: 1.5rem;
-}
-div.note-note > div > header.note-meta {
-  display: flex;
-  justify-content: space-between;
-}
-div.note-note > div > div > header.note-meta p {
-  margin: 0;
-  color: var(--secondary-text);
 }
