@@ -227,14 +227,11 @@ async function shareOrDownload() {
 
   if (webShareSupported) {
     let files = [
-      new File([blob], 'friends.txt', {
+      new File([blob], 'mainmates_backup.txt', {
         type: blob.type,
       })
     ];
-    let data = {
-      title: "mainmates Export",
-      files
-    }
+    let data = { files };
 
     if (navigator.canShare(data)) {
       try {
