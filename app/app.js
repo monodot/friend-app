@@ -28,6 +28,16 @@ const defaultRouteHandler = renderHome;
 
 const webShareSupported = 'canShare' in navigator;
 
+window.addEventListener("hashchange", navigateToView);
+navigateToView()
+  .then(() => console.log("route matched"))
+  .catch((err) => console.log(`no route matched - ${err}`));
+
+db.changes({
+  since: 'now',
+  live: true
+}).on('change', navigateToView);
+
 
 async function navigateToView() {
   let hash = window.location.hash.split("#");
@@ -263,7 +273,7 @@ async function renderHome(app) {
   <section id="friends-list">
     <friends-list></friends-list>
   </section>
-  <p class="add-thing"><a href="#" onClick="shareOrDownload();">
+  <p class="add-thing"><a href="#">
     <svg
       role="img"
       xmlns="http://www.w3.org/2000/svg"
@@ -279,24 +289,106 @@ async function renderHome(app) {
     </svg>
     <span id="export-link">Export data</span>
   </a></p>
+  <p class="add-thing"><a href="#" id="import-link">Import database (not working yet)</a></p>
 </div>
   `;
   const list = document.querySelector("friends-list");
   list.friends = await getFriends();
 
   const expLink = document.getElementById("export-link");
-  expLink.textContent = webShareSupported ? 'Share data' : 'Download data';
+  expLink.addEventListener("click", handleExport);
+  expLink.textContent = webShareSupported ? 'Share database' : 'Export database';
+
+  const impLink = document.getElementById("import-link");
+  impLink.addEventListener("click", handleImport);
 }
 
-async function shareOrDownload() {
-  let friends = await getFriends();
-  let blob = new Blob([JSON.stringify(friends)], {
-    type: 'text/plain'
+async function handleImport(event) {
+  event.preventDefault();
+  console.log("Go on, import me");
+
+  let inputEl = document.createElement("input");
+  inputEl.type = "file";
+  // inputEl.style.display = "none";
+  document.body.appendChild(inputEl);
+
+  inputEl.addEventListener("change", function(onChangeEvent) {
+    const files = onChangeEvent.target.files;
+    if (!files || files.length === 0) {
+      console.log('No file selected.');
+      return;
+    }
+
+    const file = files[0];
+
+    if (file) {
+      console.log("proceeding");
+      
+      const reader = new FileReader();
+      reader.onload = function(onLoadEvent) {
+        console.log("doing the reading");
+        const text = onLoadEvent.target.result;
+        const rows = JSON.parse(text);
+        console.log(`parsed to JSON - ${rows.length} rows`);
+        importDatabase(rows).then(function(result) {
+          console.log("good result!");
+        }).catch(function (err) { 
+          console.err(`Error - ${err}`);
+        });
+        // await importDatabase(contents);
+      }
+      reader.readAsText(file);
+    }
+  });
+
+  inputEl.click();
+
+  // const blobUrl = URL.createObjectURL(blob);
+  // const a = document.createElement('a');
+  // a.href = blobUrl;
+  // a.download = "mainmatesdb.json";
+  // a.style.display = "none";
+  // document.body.append(a);
+  // a.click();
+
+  // setTimeout(() => {
+  //   // URL.revokeObjectURL(blobUrl);
+  //   inputEl.remove();
+  // }, 1000);
+}
+
+async function importDatabase(rows) {
+  try {
+    // TODO Add some sort of validity check on the imported data
+
+    // let docs2 = [{"short_name":"James","_id":"contact_1713648380100","_rev":"1-b32ff87f87482a95a987d499991febc3"}];
+
+    let result = await db.bulkDocs(rows, {
+      new_edits: false // don't change revision
+    });
+    console.log(JSON.stringify(rows));
+    console.log("Import completed successfully!");
+    return true;
+  } catch (err) {
+    console.error(err);
+    alert("Import failed!");
+    return false;
+  }
+}
+
+async function handleExport() {
+  // let friends = await getFriends();
+  let docs = await db.allDocs({
+    include_docs: true, 
+  });
+
+  let blob = new Blob([JSON.stringify(docs.rows.map(({doc}) => doc))], {
+    type: 'text/plain' // Web Share API doesn't support JSON mime type so have to use plain text
   });
 
   if (webShareSupported) {
     let files = [
-      new File([blob], 'mainmates_backup.txt', {
+      new File([blob], 'mainmatesdb.json', {
         type: blob.type,
       })
     ];
@@ -317,7 +409,7 @@ async function shareOrDownload() {
   const blobUrl = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = blobUrl;
-  a.download = "export.json";
+  a.download = "mainmatesdb.json";
   a.style.display = "none";
   document.body.append(a);
   a.click();
@@ -326,18 +418,6 @@ async function shareOrDownload() {
     a.remove();
   }, 1000);
 }
-
-window.addEventListener("hashchange", navigateToView);
-navigateToView()
-  .then(() => console.log("route matched"))
-  .catch((err) => console.log(`no route matched - ${err}`));
-
-
-
-db.changes({
-  since: 'now',
-  live: true
-}).on('change', navigateToView);
 
 
 function showError(message) {
