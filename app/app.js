@@ -73,23 +73,8 @@ async function renderViewContact(app, params) {
   
   app.innerHTML = `
 <header class="sticky three-column">
-  <p class="nav"><a href="#" class="home-link">
-    <svg
-      role="img"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 22 22"
-      width="22px"
-      height="22px"
-    >
-      <path
-        fill="none"
-        stroke="#1768AC"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M5 12h14M5 12l4 4m-4-4l4-4"
-      />
-    </svg>
+  <p class="nav"><a href="#" class="home-link" onclick="history.back();">
+    <svg width="22px" height="22px" viewBox="0 0 512 512"><use href="#chevronback"></use></svg>
   </a></p>
   <p class="title">${contact.short_name}</p>
   <p class="context">&nbsp;</p>
@@ -97,22 +82,7 @@ async function renderViewContact(app, params) {
 <div class="view">
   <section id="contact-notes">
     <p class="add-thing"><a href="#contacts/${params}/notes/add">
-      <svg
-        role="img"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 512 512"
-        width="24px"
-        height="24px"
-      >
-        <path
-          fill="none"
-          stroke="#007AFF"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="32"
-          d="M256 112v288m144-144H112"
-        />
-      </svg>
+      <svg width="22px" height="22px" viewBox="0 0 512 512"><use href="#plus"></use></svg>
       Add new note
     </a></p>
     <notes-list></notes-list>
@@ -177,29 +147,16 @@ async function renderViewNote(app, param) {
   });
 }
 
-async function renderAddNote(app, params) {
+async function renderAddNote(app, contactId) {
   app.innerHTML = `
 <header class="sticky three-column">
   <p class="nav"><a href="#" class="home-link" onclick="history.back();">
-    <svg
-      role="img"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 22 22"
-      width="22px"
-      height="22px"
-    >
-      <path
-        fill="none"
-        stroke="#1768AC"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M5 12h14M5 12l4 4m-4-4l4-4"
-      />
-    </svg>
+    <svg width="22px" height="22px" viewBox="0 0 512 512"><use href="#chevronback"></use></svg>
   </a></p>
   <p class="title">Add note</p>
-  <p class="context">&nbsp;</p>
+  <p class="action">
+    <button id="save-note-button">Save</button>
+  </p>
 </header>
 <div class="view">
   <new-note-form></new-note-form>
@@ -210,16 +167,19 @@ async function renderAddNote(app, params) {
   const date = new Date().getTime();
   noteContainer.note = { date, body: '' };
 
-  const form = document.getElementById("new-note-form");
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const contactId = params; //  just the "contact_xxx" id 
+  const saveNoteButton = document.getElementById("save-note-button");
+  saveNoteButton.addEventListener("click", (event) => {
+    // const contactId = params; //  just the "contact_xxx" id 
     const body = document.getElementById("note-body");
     addNote(contactId, body.value)
       .then(() => {})
       .catch(() => console.error("Failed to add note"));
-    window.location.hash = `#contacts/${params}`;
+    // window.location.hash = `#contacts/${contactId}`;
+    history.back();
+
   });
+
+  window.scrollTo(0, 0);
 }
 
 async function renderAddContact(app, params) {
@@ -240,7 +200,7 @@ async function renderAddContact(app, params) {
     const name = document.getElementById("contact-name");
     addFriend(name.value)
       .then(() => {})
-      .catch(() => console.error("Failed ot add contact"));
+      .catch(() => console.error("Failed to add contact"));
     window.location.hash = "#"; // go to home page
   });
 }
@@ -680,10 +640,7 @@ class NewNoteForm extends HTMLElement {
     </label>
   </div>
   <div class="field">
-    <textarea name="body" id="note-body" class="fullwidth">${this.note.body}</textarea>
-  </div>
-  <div class="form-actions">
-    <button type="submit" class="fullwidth">Save</button>
+    <textarea name="body" id="note-body" placeholder="What happened?" class="fullwidth">${this.note.body}</textarea>
   </div>
 </form>
 `;

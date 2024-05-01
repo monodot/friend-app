@@ -12,11 +12,12 @@ body {
   --secondary-text: #64748b;
   --border-light: #e2e8f0;
   --text-default: #0f172a;
+  --action-colour: #007AFF;
 
   --margin-horizontal: 1rem;
 }
 a {
-  color: #007AFF;
+  color: var(--action-colour);
   text-decoration: none;
 }
 main {
@@ -52,7 +53,7 @@ nav.sheet-actions button {
   background: none;
   font-weight: bold;
   border: none;
-  color: #007AFF;
+  color: var(--action-colour);
 }
 
 header.sticky {
@@ -66,8 +67,22 @@ header.three-column {
   display: flex;
   justify-content: space-between;
 }
+header.three-column p.nav {
+
+}
 header.three-column p.title {
   font-weight: 700;
+}
+header.three-column p.action {
+
+}
+header.three-column p.action button {
+  background: none;
+  border: none;
+  font-weight: bold;
+  color: var(--action-colour);
+  cursor: pointer;
+  padding: 0;
 }
 header.top-level {
   padding: 1.5rem var(--margin-horizontal) 0.75rem var(--margin-horizontal);
