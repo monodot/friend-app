@@ -17,9 +17,17 @@ What's been done / what's to be done:
 - [x] Add a friend feature
 - [x] Add a note feature
 - [x] Edit existing notes
-- [ ] Export friends and notes
+- [ ] Export friends and notes (with help text / flow)
 - [ ] Add spouse / children / pet information
 - [ ] First-time intro / onboarding flow
+
+## How it works
+
+_mainmates_ is a JavaScript application that runs in your web browser. It stores your personal data entirely in your browser, with the help of a library called PouchDB. You don't need to register for an account, or upload your data to a server if you don't want to.
+
+Although it's a web application, it's designed mainly to be installed onto your smartphone, for quick access. In fact, that's how I use it. It's not available in any of the app stores yet, but to install it on iOS, go to the address below in Safari, tap Share and then tap Add to Home Screen (or words to that effect).
+
+In future, I'm planning to add cloud syncing, so that you can sync your data with a remote server, and access your data from your laptop, or another device.
 
 ## Take it for a test-drive
 
