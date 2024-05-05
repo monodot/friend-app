@@ -96,9 +96,9 @@ async function renderViewContact(app, params) {
   notesContainer.notes = notes;
 }
 
-async function renderViewNote(app, param) {
+async function renderViewNote(app, noteId) {
   console.log("HENLO");
-  const note = await getNote(param);
+  const note = await getNote(noteId);
   if (!note) {
     console.log("Could not load note");
     return false;
@@ -125,7 +125,9 @@ async function renderViewNote(app, param) {
     </svg>
   </a></p>
   <p class="title">Note</p>
-  <p class="context">&nbsp;</p>
+  <p class="action">
+    <button id="save-note-button">Save</button>
+  </p>
 </header>
 <div class="view">
   <new-note-form></new-note-form>
@@ -135,15 +137,13 @@ async function renderViewNote(app, param) {
   const noteContainer = document.querySelector("new-note-form");
   noteContainer.note = note;
 
-  const form = document.getElementById("new-note-form");
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
+  const saveNoteButton = document.getElementById("save-note-button");
+  saveNoteButton.addEventListener("click", (event) => {
     const body = document.getElementById("note-body");
-    const id = param;
-    updateNote(id, body.value)
+    updateNote(noteId, body.value)
       .then(() => {})
-      .catch(() => console.error("Failed to save note"));
-    window.location.hash = `#`;
+      .catch(() => alert("Failed to save note"));
+    history.back();
   });
 }
 
@@ -593,7 +593,7 @@ class NotesList extends HTMLElement {
                 <p>Note</p>
                 <p>${formatDate(note.doc.date)}</p>
               </div>
-              <p>${note.doc.body}</p>
+              <p>${mmd(note.doc.body)}</p>
             </div>
           </a>
         </li>`
