@@ -416,6 +416,21 @@ function formatDate(dateString) {
   return date.toLocaleDateString(undefined, { timeZone: "UTC" });
 }
 
+function sortFriendsListByShortName(data) {
+  return data.sort((a, b) => {
+    const nameA = a.doc.short_name.toUpperCase();
+    const nameB = b.doc.short_name.toUpperCase();
+
+    if (nameA < nameB) {
+        return -1;
+    }
+    if (nameA > nameB) {
+        return 1;
+    }
+    return 0;
+  });
+}
+
 
 
 // STATE ----------------------------------------------
@@ -516,7 +531,7 @@ async function updateNote(id, body) {
 
 class FriendsList extends HTMLElement {
   set friends(value) {
-    this._friends = value;
+    this._friends = sortFriendsListByShortName(value);
     this.updateComponent();
   }
 
